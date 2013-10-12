@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.version     = "0.1.1"
   s.author      = "Scott Sproule"
   s.email       = "scott.sproule@ficonab.com"
-  s.homepage    = "http://github.com/semdinsp/randprize"
+  s.homepage    = "http://github.com/semdinsp/estorm-message-processor"
   s.summary     = "Using a AMQP to process a queue. Primarily support for scripting"
   s.description = "a gem to help rails app process AMQP queues for background jobs"
   s.executables = ['']    #should be "name.rb"
