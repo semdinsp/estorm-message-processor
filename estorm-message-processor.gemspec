@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/semdinsp/estorm-message-processor"
   s.summary     = "Using a AMQP to process a queue. Primarily support for scripting"
   s.description = "a gem to help rails app process AMQP queues for background jobs"
-  s.executables = ['']    #should be "name.rb"
+  #s.executables = ['']    #should be "name.rb"
   s.files        = Dir["{lib,test}/**/*"] +Dir["bin/*.rb"] + Dir["[A-Z]*"] # + ["init.rb"]
   s.require_path = "lib"
   s.license = 'MIT'

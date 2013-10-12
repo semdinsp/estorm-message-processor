@@ -11,10 +11,12 @@ class MessageFlag
   end
 end
 class EstormMessageProcessor::Base
+   def delegate_testdelegate2(cmdhash)
+     puts "test delegate2 received #{cmdhash.inspect}"
+   end
    def delegate_testdelegate(cmdhash)
-     puts "teste delegate received #{cmdhash.inspect}"
+     puts "test delegate received #{cmdhash.inspect}"
      MessageFlag.setflag
-       
    end
 end
 
@@ -72,7 +74,7 @@ class EstormMessageProcessTest <  Minitest::Test
      
   end
   def test_client
-       cmdhash={'command'=>'testdelegate', 'promotion'=>2.to_s}
+       cmdhash={'command'=>'testdelegate2', 'promotion'=>2.to_s}
        puts "----> to system [x] sending  #{cmdhash.inspect}"
        config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueue', :blocking => true}
        bunny=EstormMessageProcessor::Client.new
