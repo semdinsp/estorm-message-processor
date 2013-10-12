@@ -39,9 +39,11 @@ This is the callback processor
 
 # send a message using the client
 Use the client to send a message to the delegate processor (background task)
+
     def bunny_send
     cmdhash={'command'=>'sendtemplates', 'promotion'=>self.id.to_s}
     puts "----> to system [x] sending  #{cmdhash.inspect}"
     bunny=EstormMessageProcessor::Client.new
     bunny.bunny_send(AMQPURL,Rails.env.production?,CONTACT_MESSAGE,cmdhash)
     end
+
