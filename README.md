@@ -14,7 +14,8 @@ Usage
 pull in the normal files for ruby.  Everytime a message is received with 'command' => "sendtemplates" delegate to that callback So add more delete_routings and you will be able to handle multiple commands
 
 ## Setup delegate processor
-This is the callback
+This is the callback processor
+
     class EstormMessageProcessor::Base
     def delegate_sendtemplates(cmdhash)
     p=Promotion.find(cmdhash['promotion'].to_i)
