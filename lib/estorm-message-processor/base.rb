@@ -21,11 +21,11 @@ module EstormMessageProcessor
 
        def process_messages(delivery_info,properties,body)
          begin
-           msg = "-----> [bunny_contact_processor] Received from App #{body} "
-           logger.info msg
            cmdhash=YAML.load(body)
            delegatestring="delegate_#{cmdhash['command']}"
            # create procedures named delegate_command accepting cmdhash
+           msg = "-----> [gem estorm message processor] Received from App #{body} calling delegate #{delegatestring} "
+           logger.info msg
            self.send(delegatestring,cmdhash)
            #load the promotion and process through data
 
