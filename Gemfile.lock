@@ -1,0 +1,29 @@
+PATH
+  remote: .
+  specs:
+    estorm-message-processor (0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    amq-protocol (1.7.0)
+    bunny (0.10.7)
+      amq-protocol (>= 1.6.0)
+    codeclimate-test-reporter (0.1.1)
+      simplecov (>= 0.7.1, < 1.0.0)
+    minitest (5.0.8)
+    multi_json (1.8.0)
+    simplecov (0.7.1)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.7.1)
+    simplecov-html (0.7.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bunny
+  codeclimate-test-reporter
+  estorm-message-processor!
+  minitest
+  multi_json
