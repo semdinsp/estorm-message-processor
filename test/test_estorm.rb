@@ -33,10 +33,11 @@ class EstormMessageProcessTest <  Minitest::Test
   end
   
   def test_startup
+    puts "test startup"
     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueue', :blocking => true}
     Thread.new {
     @f.start(config) }
-    sleep(15)
+    sleep 6
     @f.tear_down_bunny 
     assert true,"should get here"
   end
@@ -49,11 +50,12 @@ class EstormMessageProcessTest <  Minitest::Test
     assert loaded['test']==fred['test'],"values should be smae"
   end
   def test_message
+    puts "test message"
     assert MessageFlag.flag==false, "should be flase #{MessageFlag.inspect}"
     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueue', :blocking => true}
     Thread.new {
     @f.start(config) }
-    sleep(20)
+    sleep 6
     puts "after start in test message"
     Thread.new {
       
@@ -64,10 +66,21 @@ class EstormMessageProcessTest <  Minitest::Test
        puts "after bunny send"
          }
     puts "after client in test message"
-    sleep 5
+    sleep 3
     assert MessageFlag.flag==true, "should receive message and set temp #{MessageFlag.inspect}"
      @f.tear_down_bunny 
      
+  end
+  def test_client
+       cmdhash={'command'=>'testdelegate', 'promotion'=>2.to_s}
+       puts "----> to system [x] sending  #{cmdhash.inspect}"
+       config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueue', :blocking => true}
+       bunny=EstormMessageProcessor::Client.new
+       assert bunny!=nil, "bunny should not be nil"
+       bunny.bunny_send_no_close(config[:url],config[:connnecturlflag],config[:queuename],cmdhash)
+       assert bunny.connection!=nil, "should be ok"
+       res=bunny.connection.close
+       assert res=='closed'.to_sym, "should be closed: #{res.inspect}"
   end
  
   

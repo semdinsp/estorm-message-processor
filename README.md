@@ -11,7 +11,7 @@ Simple gem to use in rails apps for AMQP inclusiong. Send a hash via AMQP and th
 Usage
 =======
 
-pull in the normal files for ruby.  Everytime a message is received with 'command' => "sendtemplates" delegate to that callback So add more delete_routings and you will be able to handle multiple commands
+pull in the normal files for ruby.  Everytime a message is received with 'command' => "sendtemplates" delegate to that callback So add more delegate_routings and you will be able to handle multiple commands
 
 ## Setup delegate processor
 This is the callback processor
@@ -37,3 +37,11 @@ This is the callback processor
     puts "Exception in Message Processor: #{ex} at #{ex.backtrace.join("\n")}"
     end  
 
+# send a message using the client
+Use the client to send a message to the delegate processor (background task)
+    def bunny_send
+    cmdhash={'command'=>'sendtemplates', 'promotion'=>self.id.to_s}
+    puts "----> to system [x] sending  #{cmdhash.inspect}"
+    bunny=EstormMessageProcessor::Client.new
+    bunny.bunny_send(AMQPURL,Rails.env.production?,CONTACT_MESSAGE,cmdhash)
+    end
