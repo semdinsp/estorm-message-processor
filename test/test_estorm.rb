@@ -56,20 +56,13 @@ class EstormMessageProcessTest <  Minitest::Test
     sleep(20)
     puts "after start in test message"
     Thread.new {
-        conn = Bunny.new
-        conn.start
-    
-      channel   = conn.create_channel
-      #puts "connected: #{conn.inspect}"
-      puts "bunny sender establisedh"
-      queue    = channel.queue(config[:queuename])
-      assert queue!=nil, "queue should be valid"
+      
       cmdhash={'command'=>'testdelegate', 'temp'=>'temp'}
-      puts "about to sende message"
-      channel.default_exchange.publish(cmdhash.to_yaml, :routing_key => queue.name)
-      puts "----> to system [x] sending  #{cmdhash.inspect}"
-      conn.close
-    }
+       puts "----> to system [x] sending  #{cmdhash.inspect}"
+      bunny=EstormMessageProcessor::Client.new
+      bunny.bunny_send(config[:url],config[:connnecturlflag],config[:queuename],cmdhash)
+       puts "after bunny send"
+         }
     puts "after client in test message"
     sleep 5
     assert MessageFlag.flag==true, "should receive message and set temp #{MessageFlag.inspect}"
