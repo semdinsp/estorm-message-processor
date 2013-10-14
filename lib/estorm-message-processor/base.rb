@@ -75,8 +75,9 @@ module EstormMessageProcessor
 
              msg= "[*] Waiting for messages in #{@queue.name}.  blocking is #{config[:blocking]}"
              logger.info msg
-             msgcount,consumercount =@queue.status
-             msg = "queue status for queue #{config[:queuename]} message count: #{msgcount} consumers: #{consumercount}"
+             msg_count =@queue.message_count
+             consumer_count =@queue.consumer_count
+             msg = "queue status for queue #{config[:queuename]} message count: #{msg_count} consumers: #{consumer_count}"
              logger.info msg
              @queue.subscribe(:block => config[:blocking]) do |delivery_info, properties, body|
                process_messages(delivery_info,properties,body)
