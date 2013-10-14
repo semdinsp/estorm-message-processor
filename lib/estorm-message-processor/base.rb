@@ -30,7 +30,7 @@ module EstormMessageProcessor
            #load the promotion and process through data
 
          rescue  Exception => e    # add could not convert integer
-           msg= "found bunny exception #{e.message} found #{e.inspect} #{e.backtrace}..."  #THIS NEEDS WORK!
+           msg= "[gem estorm message processor] bunny exception #{e.message} found #{e.inspect} #{e.backtrace}..."  #THIS NEEDS WORK!
            logger.info msg
 
           end
@@ -64,37 +64,34 @@ module EstormMessageProcessor
           msg= "closing bunny"
           logger.info msg
        end
-
+       def queue_mgmt(config,msg_count)
+          msg= "[*] Waiting for messages in #{@queue.name}.  blocking is #{config[:blocking]}"
+          logger.info msg
+          count=0
+         @queue.subscribe(:block => config[:blocking]) do |delivery_info, properties, body|
+            process_messages(delivery_info,properties,body)
+            count=count+1
+            msg= "#{count}: ------processed message"
+            logger.info msg
+           end
+       end
        def start(config)
          setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
          # Run EventMachine in loop so we can reconnect when the SMSC drops our connection.
          msg= "Connecting to bunny #{config.inspect} environment #{config.inspect}"
          logger.info msg
-         loop do
-
-
-             msg= "[*] Waiting for messages in #{@queue.name}.  blocking is #{config[:blocking]}"
-             logger.info msg
-             msg_count =@queue.message_count
-             consumer_count =@queue.consumer_count
-             msg = "queue status for queue #{config[:queuename]} message count: #{msg_count} consumers: #{consumer_count}"
-             logger.info msg
-             @queue.subscribe(:block => config[:blocking]) do |delivery_info, properties, body|
-               process_messages(delivery_info,properties,body)
-               # cancel the consumer to exit
-               #delivery_info.consumer.cancel
-              end 
-
+         msg_count =@queue.message_count
+         consumer_count =@queue.consumer_count
+         msg = "queue status for queue #{config[:queuename]} message count: #{msg_count} consumers: #{consumer_count}"
+         logger.info msg
+         @loopflag=true
+           while @loopflag do   
+             queue_mgmt(config,msg_count)
            end
-           msg= "Disconnected. Reconnecting in 5 seconds.."
-           logger.info msg
-           #puts msg
-           tear_down_bunny
-           sleep 1
-           setup_bunny_communications
-           sleep 4
-
-
+         msg= "Ending======about to tear_down_bunny...."
+         logger.info msg
+         tear_down_bunny
+           
        end
 
      
