@@ -47,6 +47,6 @@ Use the client to send a message to the delegate processor (background task)
     bunny.bunny_send(AMQPURL,Rails.env.production?,CONTACT_MESSAGE,cmdhash)
     end
 
-# config[:one_shot] = true if you want to just process the messages in the queue
+# config[:exit_when_empty] = true if you want to just process the messages in the queue
 This is useful if you have a back ground task that you want to run occasionally and just process the messages and exit.  For example on heroku you can schedule a job to run every hour and it will process the messages and exit.  This will keep the costs down for the background task on heroku.  (Of course you need to ensure that the job time is shorter than the heroku scheduler time)
 

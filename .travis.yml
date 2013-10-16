@@ -10,6 +10,7 @@ script:
   - bundle install
   - cd test; 
   - ruby test_estorm.rb
+  - ruby test_consumer.rb
 notifications:
   recipients:
     - scott.sproule@estormtech.com
