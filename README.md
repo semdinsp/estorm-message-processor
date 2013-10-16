@@ -6,7 +6,7 @@ estorm-message-processor gem
 ============
 
 
-Simple gem to use in rails apps for AMQP inclusiong. Send a hash via AMQP and then have the message processor process the files.  See the test pages
+Simple gem to use in rails apps for AMQP inclusion. Send a hash via AMQP and then have the message processor process the files.  See the test pages
 
 Usage
 =======
@@ -14,9 +14,9 @@ Usage
 pull in the normal files for ruby.  Everytime a message is received with 'command' => "sendtemplates" delegate to that callback So add more delegate_routings and you will be able to handle multiple commands
 
 ## Setup delegate processor
-This is the callback processor
+This is the callback processor in the consumer
 
-    class EstormMessageProcessor::Base
+    class EstormMessageProcessor::Consumer
     def delegate_sendtemplates(cmdhash)
     p=Promotion.find(cmdhash['promotion'].to_i)
     data=YAML.load(p.data)
@@ -32,13 +32,13 @@ This is the callback processor
     EstormMessageProcessor::Base.logger=Logger.new(STDOUT) 
     puts "Starting Bunny Contact Processor on #{config.inspect} "  
     mp = EstormMessageProcessor::Base.new
-    mp.start(config)
+    mp.start(config)  # THIS MAY NEED TO BE IN a THREAD
     rescue Exception => ex
     puts "Exception in Message Processor: #{ex} at #{ex.backtrace.join("\n")}"
     end  
 
 # send a message using the client
-Use the client to send a message to the delegate processor (background task)
+Use the client to send a message to the delegate processor (background task). Note the command set to the callback processor above
 
     def bunny_send
     cmdhash={'command'=>'sendtemplates', 'promotion'=>self.id.to_s}
