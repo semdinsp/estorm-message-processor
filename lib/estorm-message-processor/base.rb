@@ -54,7 +54,7 @@ module EstormMessageProcessor
             msg=   "ON DELIVERY: #{@consumer.count}: messages processed"
             logger.info msg
             msg_count,consumer_count = @consumer.queue_statistics
-            @consumer.cancel if msg_count==0 and config[:exit_when_empty]
+            @consumer.cancel if msg_count==0 && config[:exit_when_empty]
            end
        end
        
@@ -73,7 +73,7 @@ module EstormMessageProcessor
          
          loop do   
              #should loop forever if blocking... otherwise needs  a loop
-            sleep 2
+            sleep 1
             break if @consumer.cancelled?
           end
          msg= "Ending======about to tear_down_bunny...."
