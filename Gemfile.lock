@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    estorm-message-processor (0.1.7)
+    estorm-message-processor (0.2.1)
 
 GEM
   remote: https://rubygems.org/

@@ -57,26 +57,30 @@ class EstormMessageProcessTest <  Minitest::Test
   def test_processor_exits_after_queue_empty
      puts "test several  message"
      assert MessageFlag.flag==false, "should be flase #{MessageFlag.inspect}"
-     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueueMessageExit', :blocking => false, :consumer_name => "test exit consumer", :exit_when_empty => true}
+     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueueMessageExit', :blocking => true, :consumer_name => "test exit consumer",  :exit_when_done => true}
      # PRELOAD THE QUEUE WITH MESSAGES
-     t2= Thread.new {
+       bunnysender=EstormMessageProcessor::Client.new
+       bunnysender.setup_bunny(config[:url],config[:connnecturlflag])
 
        cmdhash={'command'=>'testdelegate3', 'temp'=>'serveral messages'}
         puts "----> to system [x] sending  #{cmdhash.inspect}"
+         
         1.upto(7) { |i| 
-         bunnysender=EstormMessageProcessor::Client.new
+      
          cmdhash['temp']="mesage #{i}"
-         bunnysender.bunny_send(config[:url],config[:connnecturlflag],config[:queuename],cmdhash)
+         bunnysender.bunny_send_no_close(config[:queuename],cmdhash)
           puts "after bunny send test_message: #{cmdhash['temp']}"
             }
-          }
+          
      puts "after client in test message"
-     t1=Thread.new {
       @f.start(config) 
-      puts " should  get here this thread about to exit in tes_messag"}
-      assert t1.alive? , "should be alive"
-      sleep 10
-       assert !t1.alive? , "should be dead after processing messages"
+#        bunnysender.connection.close
+      puts " should  get here this thread about to exit in tes_messag"
+     
+      time=10
+      puts "sleeping #{time} seconds"
+      sleep time
+      
      sleep 1
        
        assert MessageFlag.testval==7, "should receive 7 message and set temp #{MessageFlag.testval}"

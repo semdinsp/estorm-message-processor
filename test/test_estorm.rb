@@ -62,7 +62,7 @@ class EstormMessageProcessTest <  Minitest::Test
   
   def test_delegate
     puts "test delegate"
-    config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testdelegatequeue', :blocking => true,:consumer_name => "test consumer delete startup consumer"}
+    config={:url => 'fakeurl',:connecturlflag=> false,:timeout => 0,:queuename => 'testdelegatequeue', :blocking => true,:consumer_name => "test consumer delete startup consumer"}
       cmdhash={'command'=>'testdelegate', 'temp'=>'test_delegate'}
       t1 =Thread.new {
          @f.start(config) }
@@ -70,26 +70,29 @@ class EstormMessageProcessTest <  Minitest::Test
     assert @f.consumer!=nil, "consumer should not be nil"
     @f.consumer.send("delegate_testdelegate",cmdhash)
    assert MessageFlag.flag==true, "should receive message and set temp #{MessageFlag.flag}"
+   sleep 3
   end
   def test_basic_startup
     puts "test basic startup"
-    config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testbasicqueue', :blocking => false,:consumer_name => "test basic non blocking consumer"}
+    config={:url => 'fakeurl',:connecturlflag=> false,:timeout => 0,:queuename => 'testbasicqueue', :blocking => false,:consumer_name => "test basic non blocking consumer"}
     
     t1 =Thread.new {
       @f.start(config) }
     sleep 2
-    @f.tear_down_bunny     #NEED TO FIGURE OUT HOW TO STOP
+   # @f.tear_down_bunny     #NEED TO FIGURE OUT HOW TO STOP
     assert true,"should get here test_startup"
   end
   def test_startup
     puts "test startup"
-    config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueue', :blocking => true,:consumer_name => "test startup consumer"}
+    config={:url => 'fakeurl',:connecturlflag=> false,:timeout => 0,:queuename => 'testqueue', :blocking => true,:consumer_name => "test startup consumer"}
     t1 =Thread.new {
        @f.start(config) }
     sleep 2
     @f.tear_down_bunny    
+    sleep 1
     t1.exit
     assert true,"should get here test_startup"
+    sleep 3
   end
   def test_1yaml
     puts "in yaml test"
@@ -102,11 +105,11 @@ class EstormMessageProcessTest <  Minitest::Test
   def test_message
     puts "test  message"
     assert MessageFlag.flag==false, "should be flase #{MessageFlag.inspect}"
-    config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testseveralMessages', :blocking => true, :consumer_name => "test message consumer"}
+    config={:url => 'fakeurl',:connecturlflag=> false,:timeout => 0,:queuename => 'testsevalMessages', :blocking => true, :consumer_name => "test message consumer"}
     t1=Thread.new {
     @f.start(config) 
     puts " should not get here this thread about to exit in tes_messag"}
-    sleep 6
+    sleep 1
     t2= Thread.new {
       
       cmdhash={'command'=>'testdelegate', 'temp'=>'temp'}
@@ -116,22 +119,23 @@ class EstormMessageProcessTest <  Minitest::Test
        puts "after bunny send test_message"
          }
     puts "after client in test message"
-    sleep 1
+    sleep 5
+    
       assert MessageFlag.flag==true, "should receive message and set temp #{MessageFlag.flag}"
    
-     @f.tear_down_bunny 
+     sleep 1
      t1.exit
      t2.exit
-     
+     sleep 1
   end
   def test_several_message
      puts "test several  message"
      assert MessageFlag.flag==false, "should be flase #{MessageFlag.inspect}"
-     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueueMessage', :blocking => true, :consumer_name => "test message consumer"}
+     config={:url => 'fakeurl',:connecturlflag=> false,:timeout => 0,:queuename => 'testqueuesMessage', :blocking => true, :consumer_name => "test message consumer"}
      t1=Thread.new {
      @f.start(config) 
      puts " should not get here this thread about to exit in tes_messag"}
-     sleep 2
+     sleep 1
      t2= Thread.new {
 
        cmdhash={'command'=>'testdelegate2', 'temp'=>'serveral messages'}
@@ -144,26 +148,71 @@ class EstormMessageProcessTest <  Minitest::Test
             }
           }
      puts "after client in test message"
-     sleep 1
-      @f.tear_down_bunny 
+     sleep 15
+  #    @f.tear_down_bunny 
+      sleep 1
        assert MessageFlag.testval==7, "should receive 7 message and set temp #{MessageFlag.testval}"
      
 
       t1.exit
       t2.exit
-
+      sleep 3
    end
+   def test_several_message_again
+       puts "test several  message"
+       assert MessageFlag.flag==false, "should be flase #{MessageFlag.inspect}"
+       config={:url => 'fakeurl',:connecturlflag=> false,:timeout => 0,:queuename => 'testqueuesMessage again', :blocking => true, :consumer_name => "test message consumer"}
+       t1=Thread.new {
+       @f.start(config) 
+       puts " should not get here this thread about to exit in tes_messag"}
+       sleep 1
+       t2= Thread.new {
+
+         cmdhash={'command'=>'testdelegate2', 'temp'=>'serveral messages'}
+          puts "----> to system [x] sending  #{cmdhash.inspect}"
+          1.upto(7) { |i| 
+           bunnysender=EstormMessageProcessor::Client.new
+           cmdhash['temp']="mesage #{i}"
+           bunnysender.bunny_send(config[:url],config[:connnecturlflag],config[:queuename],cmdhash)
+            puts "after bunny send test_message"
+              }
+            }
+       puts "after client in test message"
+       sleep 15
+    #    @f.tear_down_bunny 
+        sleep 1
+         assert MessageFlag.testval==7, "should receive 7 message and set temp #{MessageFlag.testval}"
+         count=4
+          t2= Thread.new {
+
+            cmdhash={'command'=>'testdelegate2', 'temp'=>'serveral messages'}
+             puts "----> to system [x] sending  #{cmdhash.inspect}"
+             1.upto(count) { |i| 
+              bunnysender=EstormMessageProcessor::Client.new
+              cmdhash['temp']="mesage #{i}"
+              bunnysender.bunny_send(config[:url],config[:connnecturlflag],config[:queuename],cmdhash)
+               puts "after bunny send test_message"
+                 }
+               }
+        sleep 10
+          assert MessageFlag.testval==7+count, "should receive #{7+count} message and set temp #{MessageFlag.testval}"
+        t1.exit
+        t2.exit
+        sleep 3
+     end
   def test_client
        puts "test client  -- basic"
        cmdhash={'command'=>'testdelegate2', 'promotion'=>2.to_s}
        puts "----> to system [x] sending  #{cmdhash.inspect}"
-       config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testqueue7', :blocking => true, :consumer_name => "test consumer"}
+       config={:url => 'fakeurl',:connecturlflag=> false,:timeout => 0,:queuename => 'testqueue7', :blocking => true, :consumer_name => "test consumer"}
        bunny=EstormMessageProcessor::Client.new
        assert bunny!=nil, "bunny should not be nil"
-       bunny.bunny_send_no_close(config[:url],config[:connnecturlflag],config[:queuename],cmdhash)
+       bunny.setup_bunny(config[:url],config[:connnecturlflag])
+       bunny.bunny_send_no_close(config[:queuename],cmdhash)
        assert bunny.connection!=nil, "should be ok"
        res=bunny.connection.close
        assert res=='closed'.to_sym, "should be closed: #{res.inspect}"
+       sleep 3
   end
  
   

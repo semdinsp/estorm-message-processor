@@ -27,8 +27,9 @@ class EstormConsumerProcessTest <  Minitest::Test
   end
   def test_cancel
     puts "testing consumer"
-    config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testconsumerqueue', :blocking => true, :consumer_name => "test consumer"}
+    config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testconsumerqueue', :blocking => true, :timeout => 0, :consumer_name => "test consumer"}
     @f.setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
+    assert @f.channel.open? , "channel should be open"
     @consumer = EstormMessageProcessor::Consumer.new(@f.channel, @f.queue)
      @consumer.logger=@f.logger
     assert !@consumer.cancelled?, "should not be cancelled"
@@ -39,7 +40,7 @@ class EstormConsumerProcessTest <  Minitest::Test
   end 
   def test_consumer_increment
      puts "testing consumer"
-     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testconsumerqueue', :blocking => true, :consumer_name => "test consumer"}
+     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testconsumerqueue',:timeout => 0, :blocking => true, :consumer_name => "test consumer"}
      @f.setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
      @consumer = EstormMessageProcessor::Consumer.new(@f.channel, @f.queue)
      @consumer.logger=@f.logger
@@ -49,9 +50,17 @@ class EstormConsumerProcessTest <  Minitest::Test
         assert @consumer.increment
         assert @consumer.count==2, "should  be 2 but is #{@consumer.count}"
    end
+    def test_qos
+      puts "test startup"
+      config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testdelegatequeue', :timeout => 0,:blocking => true,:consumer_name => "test consumer delete startup consumer"}
+        cmdhash={'command'=>'testdelegate', 'temp'=>'test_delegate'}
+         @f.setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
+         res=@f.channel.prefetch(1)
+     assert res.is_a?(AMQ::Protocol::Basic::QosOk), "should set prefetch #{res} methods "
+    end
    def test_delegate
      puts "test startup"
-     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testdelegatequeue', :blocking => true,:consumer_name => "test consumer delete startup consumer"}
+     config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testdelegatequeue', :timeout => 0,:blocking => true,:consumer_name => "test consumer delete startup consumer"}
        cmdhash={'command'=>'testdelegate', 'temp'=>'test_delegate'}
         @f.setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
          @consumer = EstormMessageProcessor::Consumer.new(@f.channel, @f.queue)
@@ -63,7 +72,7 @@ class EstormConsumerProcessTest <  Minitest::Test
    end
   def test_consumer
     puts "testing consumer"
-    config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testconsumerqueue2', :blocking => true, :consumer_name => "test consumer"}
+    config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testconsumerqueue2', :timeout => 0, :blocking => true, :consumer_name => "test consumer"}
     @f.setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
     @consumer = EstormMessageProcessor::Consumer.new(@f.channel, @f.queue)
     @consumer.logger=@f.logger
@@ -84,7 +93,7 @@ class EstormConsumerProcessTest <  Minitest::Test
   end
   def test_queueu_stats
      puts "testing consumer"
-      config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testconsumerqueue', :blocking => true, :consumer_name => "test consumer2"}
+      config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testconsumerqueue', :timeout => 0,:blocking => true, :consumer_name => "test consumer2"}
       @f.setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
       @consumer = EstormMessageProcessor::Consumer.new(@f.channel, @f.queue)
       @consumer.logger=@f.logger

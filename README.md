@@ -11,10 +11,10 @@ Simple gem to use in rails apps for AMQP inclusion. Send a hash via AMQP and the
 Usage
 =======
 
-pull in the normal files for ruby.  Everytime a message is received with 'command' => "sendtemplates" delegate to that callback So add more delegate_routings and you will be able to handle multiple commands
+pull in the normal files for ruby.  Everytime a message is received with 'command' => "sendtemplates" delegated to that callback So add more delegate_routings and you will be able to handle multiple commands
 
 ## Setup delegate processor
-This is the callback processor in the consumer
+This is the callback processor in the consumer.  Just define this in your script with the name of procedure like delegate_XXXXX
 
     class EstormMessageProcessor::Consumer
     def delegate_sendtemplates(cmdhash)
@@ -27,7 +27,7 @@ This is the callback processor in the consumer
 
 # Start the Message Processor
     begin
-    config={:url => AMQPURL,:connecturlflag=> Rails.env.production? ,:queuename => CONTACT_MESSAGE, :blocking => true}
+    config={:url => AMQPURL,:connecturlflag=> Rails.env.production? ,:queuename => CONTACT_MESSAGE, :blocking => true, :timeout => 0, :consumer_name => "test consumer"}
     #puts "Starting SMS Gateway. Please check the log at #{LOGFILE}"
     EstormMessageProcessor::Base.logger=Logger.new(STDOUT) 
     puts "Starting Bunny Contact Processor on #{config.inspect} "  
@@ -38,7 +38,7 @@ This is the callback processor in the consumer
     end  
 
 # send a message using the client
-Use the client to send a message to the delegate processor (background task). Note the command set to the callback processor above
+Use the client to send a message to the delegate processor (background task). Note the command set to the callback processor above.  You can also see multiple sends in the test files.
 
     def bunny_send
     cmdhash={'command'=>'sendtemplates', 'promotion'=>self.id.to_s}
@@ -47,6 +47,6 @@ Use the client to send a message to the delegate processor (background task). No
     bunny.bunny_send(AMQPURL,Rails.env.production?,CONTACT_MESSAGE,cmdhash)
     end
 
-# config[:exit_when_empty] = true if you want to just process the messages in the queue
+# set the config[:exit_when_done] => true value if you want the task to exit.  
 This is useful if you have a back ground task that you want to run occasionally and just process the messages and exit.  For example on heroku you can schedule a job to run every hour and it will process the messages and exit.  This will keep the costs down for the background task on heroku.  (Of course you need to ensure that the job time is shorter than the heroku scheduler time)
 

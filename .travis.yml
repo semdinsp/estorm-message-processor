@@ -11,6 +11,7 @@ script:
   - cd test; 
   - ruby test_estorm.rb
   - ruby test_consumer.rb
+  - ruby test_single.rb
 notifications:
   recipients:
     - scott.sproule@estormtech.com

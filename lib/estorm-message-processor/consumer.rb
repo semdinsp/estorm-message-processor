@@ -12,12 +12,19 @@ module EstormMessageProcessor
         @mycount=0  if @mycount==nil
         @mycount
     end
+    @exit_flag=false
+    def target(count,flag)
+      puts "target is #{count} flag is #{flag}"
+      @exit_flag=flag
+      @exit_count=count-1
+    end
     def increment
        @mycount=self.count+1
+       @cancelled=true if @exit_flag && @exit_count < @mycount
+       @mycount
     end
 
     def handle_cancellation(_)
-      
       msg="consumer cancellation queue called"
       @logger.info msg
       @cancelled = true
