@@ -65,7 +65,7 @@ module EstormMessageProcessor
                # ack the message to get the next message
             #msg_count,consumer_count = @consumer.queue_statistics  # POSSIBLE RACE CONDITION
            # @consumer.cancel if msg_count==0 && config[:exit_when_empty]
-           end
+           end if !config[:exit_when_done] or msg_count >0
        end
        def queue_creation(config)
           setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
@@ -82,6 +82,7 @@ module EstormMessageProcessor
          msg= "Connecting to bunny environment #{config.inspect}"
          logger.info msg
          queue_creation(config)
+         config[:exit_when_done]=false if  config[:exit_when_done]==nil
          # the block flag shuts down the thread. the timeout values says whether to unsubscriber
          #need to set ack to true to manage the qos parameter
         # retval= @queue.subscribe_with(@consumer,:ack => true, :block => config[:blocking], :timeout => config[:timeout])
