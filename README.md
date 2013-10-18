@@ -6,7 +6,11 @@ estorm-message-processor gem
 ============
 
 
-Simple gem to use in rails apps for AMQP inclusion. Send a hash via AMQP and then have the message processor process the files.  See the test pages
+Simple gem to use in rails apps for AMQP inclusion. Send a hash via AMQP and then have the message processor process the files.  See the test pages.  They key use cases for this are
+* When you want a back ground task to continually process messages (see _test_estorm.rb_ for examples)
+* When you want to schedule a background task to periodically consume and process messages. (eg every 30 minutes perform the task see _test_single.rb_)
+
+The second usage case allows you to use periodic jobs on heroku.  Thus your costing is just for time taken to process all the messages. IN hte first case you need to pay for a dyno for a 24 hour period.  The difference between the two usage patterns is a simple flag so it is convenient to start inexpensively and scale when needed.
 
 Usage
 =======

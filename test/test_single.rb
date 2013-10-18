@@ -86,4 +86,30 @@ class EstormMessageProcessTest <  Minitest::Test
        assert MessageFlag.testval==7, "should receive 7 message and set temp #{MessageFlag.testval}"
 
    end
+    def test_processor_exits_when_queue_empty
+        puts "test several  message"
+        assert MessageFlag.flag==false, "should be flase #{MessageFlag.inspect}"
+        config={:url => 'fakeurl',:connecturlflag=> false,:queuename => 'testEmptyqueueMessageExit', :blocking => true, :consumer_name => "test exit consumer",  :exit_when_done => true}
+        # PRELOAD THE QUEUE WITH MESSAGES
+          bunnysender=EstormMessageProcessor::Client.new
+          conn,chan=bunnysender.setup_bunny(config[:url],config[:connnecturlflag])
+          assert conn!=nil, "connection shold be established"
+          assert chan!=nil, "connection shold be established"
+          chan.queue(config[:queuename]).purge
+          
+
+        puts "after purging queue in test message"
+         @f.start(config) 
+   #        bunnysender.connection.close
+         puts " should  get here this thread about to exit in tes_messag"
+
+         time=10
+         puts "sleeping #{time} seconds"
+         sleep time
+
+        sleep 1
+
+          assert true,"should get here..."
+
+      end
 end

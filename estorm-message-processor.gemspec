@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "estorm-message-processor"
-  s.version     = "0.2.3"
+  s.version     = "0.2.4"
   s.author      = "Scott Sproule"
   s.email       = "scott.sproule@ficonab.com"
   s.homepage    = "http://github.com/semdinsp/estorm-message-processor"

@@ -13,8 +13,10 @@ module EstormMessageProcessor
         @mycount
     end
     @exit_flag=false
+    # this is a target to count messages and exit if needed
     def target(count,flag)
-      puts "target is #{count} flag is #{flag}"
+      msg = "-- Message Processor exit when complete flag set: target messages is #{count} flag is #{flag}"
+      logger.info msg
       @exit_flag=flag
       @exit_count=count-1
     end

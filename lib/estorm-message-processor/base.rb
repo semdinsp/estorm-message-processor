@@ -53,19 +53,17 @@ module EstormMessageProcessor
           logger.info msg
           count=0
         #  @channel.prefetch(1)   # set quality of service to only delivery one message at a time....
-          msg_count,consumer_count = @consumer.queue_statistics  # just to get the stats before entering hte queue
+          @msg_count,consumer_count = @consumer.queue_statistics  # just to get the stats before entering hte queue
        #  @queue.subscribe(:block => config[:blocking]) do |delivery_info, properties, body|
-         @consumer.target(msg_count,config[:exit_when_done]) if config[:exit_when_done]
+         @consumer.target(@msg_count,config[:exit_when_done]) if config[:exit_when_done]
          @consumer.on_delivery() do |delivery_info, metadata, payload|
             @consumer.process_messages(delivery_info,metadata,payload)
-       #     @consumer.channel.acknowledge(delivery_info.delivery_tag, false) if @consumer.channel!=nil && @consumer.channel.open?
             msg=   "ON DELIVERY: #{@consumer.count}: messages processed"
             logger.info msg
             @channel.close if @consumer.cancelled? 
-               # ack the message to get the next message
-            #msg_count,consumer_count = @consumer.queue_statistics  # POSSIBLE RACE CONDITION
+           
            # @consumer.cancel if msg_count==0 && config[:exit_when_empty]
-           end if !config[:exit_when_done] or msg_count >0
+           end 
        end
        def queue_creation(config)
           setup_bunny_communications(config[:url],config[:connecturlflag],config[:queuename])
@@ -74,20 +72,21 @@ module EstormMessageProcessor
 
           @consumer.logger=logger
           raise "consumer creation problem" if @consumer==nil
-          msg_count,consumer_count =@consumer.queue_statistics
           queue_mgmt(config)
        end
        
        def start(config)
          msg= "Connecting to bunny environment #{config.inspect}"
          logger.info msg
-         queue_creation(config)
          config[:exit_when_done]=false if  config[:exit_when_done]==nil
+         queue_creation(config)
+         
          # the block flag shuts down the thread. the timeout values says whether to unsubscriber
          #need to set ack to true to manage the qos parameter
         # retval= @queue.subscribe_with(@consumer,:ack => true, :block => config[:blocking], :timeout => config[:timeout])
         #  retval= @queue.subscribe_with(@consumer,:ack => true, :block => config[:blocking])
-        retval= @queue.subscribe_with(@consumer, :block => config[:blocking])
+        retval ="[did not subscribe as msg count = 0]"
+        retval= @queue.subscribe_with(@consumer, :block => config[:blocking])  if !config[:exit_when_done] or @msg_count >0
         # loop do   
              #should loop forever if blocking... otherwise needs  a loop
          #   sleep 1

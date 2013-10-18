@@ -99,6 +99,7 @@ class EstormConsumerProcessTest <  Minitest::Test
       @consumer.logger=@f.logger
       assert @consumer.consumer_tag=config[:consumer_name]
       mc,cc=@consumer.queue_statistics
+      puts "MESSAGE COUNT #{mc.inspect}"
       assert mc!=nil, "mc should have vlue"
       assert cc!=nil, "concsumer count should have value"
       assert true, "should get here without a problem"
