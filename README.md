@@ -31,7 +31,7 @@ This is the callback processor in the consumer.  Just define this in your script
 
 # Start the Message Processor
     begin
-    config={:url => AMQPURL,:connecturlflag=> Rails.env.production? ,:queuename => CONTACT_MESSAGE, :blocking => true, :timeout => 0, :consumer_name => "test consumer"}
+    config={:url => AMQPURL,:connecturlflag=> Rails.env.production? ,:queuename => CONTACT_MESSAGE, :blocking => true, :consumer_name => "test consumer"}
     #puts "Starting SMS Gateway. Please check the log at #{LOGFILE}"
     EstormMessageProcessor::Base.logger=Logger.new(STDOUT) 
     puts "Starting Bunny Contact Processor on #{config.inspect} "  
@@ -42,7 +42,7 @@ This is the callback processor in the consumer.  Just define this in your script
     end  
 
 # send a message using the client
-Use the client to send a message to the delegate processor (background task). Note the command set to the callback processor above.  You can also see multiple sends in the test files.
+Use the client to send a message to the delegate processor (background task). Note the command value set in the hash to the callback processor above.  You can also see multiple sends in the test files. The hash can contain anything as long as the command is set to a delegate name. (Where the delegate name is built by joining delegate_ and the command name  delegate_sendtemplates in this example)
 
     def bunny_send
     cmdhash={'command'=>'sendtemplates', 'promotion'=>self.id.to_s}
