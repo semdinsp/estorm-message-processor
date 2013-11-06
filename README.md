@@ -54,3 +54,6 @@ Use the client to send a message to the delegate processor (background task). No
 # set the config[:exit_when_done] => true value if you want the task to exit.  
 This is useful if you have a back ground task that you want to run occasionally and just process the messages and exit.  For example on heroku you can schedule a job to run every hour and it will process the messages and exit.  This will keep the costs down for the background task on heroku.  (Of course you need to ensure that the job time is shorter than the heroku scheduler time)
 
+# :prefetch_one => true
+Use this if you want the message_processor to only grab one message a time.  This way you can easily spin up several message processors
+

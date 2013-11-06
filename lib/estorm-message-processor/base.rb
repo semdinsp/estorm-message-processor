@@ -52,7 +52,7 @@ module EstormMessageProcessor
           msg= "[*] Waiting for messages in #{@queue.name}.  blocking is #{config[:blocking]}"
           logger.info msg
           count=0
-        #  @channel.prefetch(1)   # set quality of service to only delivery one message at a time....
+          @channel.prefetch(1)  if config[:prefetch_one] # set quality of service to only delivery one message at a time....
           @msg_count,consumer_count = @consumer.queue_statistics  # just to get the stats before entering hte queue
        #  @queue.subscribe(:block => config[:blocking]) do |delivery_info, properties, body|
          @consumer.target(@msg_count,config[:exit_when_done]) if config[:exit_when_done]
