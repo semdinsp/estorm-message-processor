@@ -11,7 +11,7 @@ module EstormMessageProcessor
     @conn = Bunny.new if !flag
     @conn.start
   rescue Bunny::PossibleAuthenticationFailureError => e
-    puts "Could not authenticate as #{conn.username}"
+    puts "Could not authenticate as #{@conn.username}"
   end
   @channel   = @conn.create_channel
   #puts "connected: #{conn.inspect}"
