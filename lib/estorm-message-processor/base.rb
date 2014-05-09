@@ -41,9 +41,10 @@ module EstormMessageProcessor
             @consumer.cancel if @consumer!=nil && !@consumer.cancelled?
             sleep 1
           #  @queue.unsubscribe
-          #  @conn.close if @channel != nil && @channel.open?
+          
           #  sleep 0.5
           end
+          @conn.close if @conn != nil && @conn.open?    #new by soctt
           msg= "closing bunny"
           logger.info msg
        end
