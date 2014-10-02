@@ -12,6 +12,10 @@ module EstormMessageProcessor
     @conn.start
   rescue Bunny::PossibleAuthenticationFailureError => e
     puts "Could not authenticate as #{@conn.username}"
+  rescue Bunny::TCPConnectionFailed => e
+    puts "BUNNY TCP CONNECTION FAILURE -----RETRY #{e.message}"
+    sleep 3
+    @conn.start if @conn!=nil
   end
   @channel   = @conn.create_channel
   #puts "connected: #{conn.inspect}"
